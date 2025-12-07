@@ -29,7 +29,9 @@
                     <li class="nav-item"><a class="nav-link" href="/logout">Abmelden</a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="/login">Anmelden</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/register">Registrieren</a></li>
+                    {% if 'username' not in session %}
+                        <li class="nav-item"><a class="nav-link" href="/register">Registrieren</a></li>
+                    {% endif %}
                 {% endif %}
             </ul>
         </div>
