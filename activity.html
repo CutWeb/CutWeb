@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letzte Aktivitäten</title>
+</head>
+<body>
+    <h1>Letzte Aktivitäten</h1>
+    <ul>
+        {% for activity in activities %}
+            <li>{{ activity }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Zurück</a>
+</body>
+</html>
