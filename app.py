@@ -34,8 +34,8 @@ load_dotenv()
 
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))  # Standardwert 587 für TLS
-EMAIL_ADDRESS = os.getenv("cutweb0@gmail.com")
-EMAIL_PASSWORD = os.getenv("hflk szeq voyc mzjq")
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 AUDIT_LOG_FILE = 'audit_logs.json'
 
