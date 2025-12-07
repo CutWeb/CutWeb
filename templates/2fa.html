@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zwei-Faktor-Authentifizierung</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Zwei-Faktor-Authentifizierung</h1>
+        <p>Ein Code wurde an deine E-Mail-Adresse gesendet. Bitte gib ihn hier ein:</p>
+        <form action="/2fa" method="POST">
+            <label for="code">Code:</label>
+            <input type="text" name="code" id="code" required>
+            <button type="submit">Bestätigen</button>
+        </form>
+    </div>
+</body>
+</html>
+

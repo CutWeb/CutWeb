@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CutWeb</title>
+<link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+<style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+             background-image:url('https://i.pinimg.com/originals/0c/e6/6b/0ce66b2c514f64099fc903d1deea8e5c.png');
+             background-size:cover;background-position:center;min-height:100vh;}
+        nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;background:rgba(0,0,0,.8)}
+        .nav-title{color:#fff;font-weight:700}
+        .nav-buttons{display:flex;gap:.5rem;align-items:center}
+        .login-btn,.logout-btn{background:#007bff;color:#fff;padding:.6rem 1rem;border:none;border-radius:6px;cursor:pointer;text-decoration:none}
+        .logout-btn{background:#dc3545}
+        .login-btn:hover{background:#0056b3}.logout-btn:hover{background:#c82333}
+        .container{max-width:720px;margin:3rem auto;background:rgba(255,255,255,0.95);padding:2rem;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.15)}
+        h1{text-align:center;margin-bottom:1rem;color:#222}
+        .checkbox-container{display:flex;align-items:center;gap:.6rem}
+        input[type="text"],input[type="email"],input[type="password"]{width:100%;padding:.7rem;border:1px solid #ddd;border-radius:6px}
+        button[type="submit"]{background:#28a745;color:#fff;padding:.7rem;border:none;border-radius:6px;cursor:pointer}
+        button[type="submit"]:hover{background:#218838}
+        .error{background:#f8d7da;color:#842029;padding:.6rem;border-radius:6px;margin-bottom:1rem}
+        .success{background:#d4edda;color:#0f5132;padding:.6rem;border-radius:6px;margin-bottom:1rem}
+
+        /* Modal */
+        .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .modal-content{background:#fff;width:92%;max-width:420px;padding:1.2rem;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+        .tab-buttons{display:flex;gap:.4rem;margin-bottom:.8rem}
+        .tab-btn{flex:1;padding:.5rem;border:1px solid #e6e9ee;border-radius:6px;background:#fff;cursor:pointer}
+        .tab-btn.active{background:#007bff;color:#fff;border-color:#007bff}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        label{display:block;margin:.45rem 0;color:#444;font-weight:600;font-size:.95rem}
+        .small{font-size:.9rem;color:#666;margin-top:.5rem}
+
+        /* reuse modal styles */
+        textarea{width:100%;min-height:120px;padding:.6rem;border:1px solid #ddd;border-radius:6px}
+        .support-btn{background:#17a2b8;color:#fff;padding:.5rem .9rem;border-radius:6px;border:none;cursor:pointer}
+        .support-btn:hover{background:#138496}
+        .support-list{margin-top:1rem;border:1px solid #e6e9ee;padding:1rem;border-radius:8px;background:#fafafa}
+        .support-item{padding:.6rem 0;border-bottom:1px solid #eef}
+        .support-meta{color:#666;font-size:.9rem}
+        .small-btn{background:none;border:0;color:#007bff;cursor:pointer;padding:0}
+
+        /* NAV: clean, modern, Twitch-like dropdown */
+        .topnav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));backdrop-filter:blur(6px);border-radius:12px;margin:12px}
+        .brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700}
+        .brand-name{font-size:1.05rem}
+        .nav-right{display:flex;align-items:center;gap:12px}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:0;background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600}
+        .btn svg{opacity:.95}
+        .btn:hover{background:rgba(255,255,255,0.09)}
+        .login-btn{background:linear-gradient(90deg,#3b82f6,#7c3aed);box-shadow:0 6px 18px rgba(99,102,241,0.12)}
+        .support-btn{background:linear-gradient(90deg,#06b6d4,#0ea5a5);box-shadow:0 6px 18px rgba(6,182,212,0.09)}
+
+
+        /* avatar */
+        .avatar-menu-wrapper{position:relative}
+        .avatar-btn{background:none;border:0;padding:0;cursor:pointer}
+        .nav-avatar, .nav-avatar-fallback{width:40px;height:40px;border-radius:10px;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+        .nav-avatar{border:2px solid rgba(255,255,255,0.08)}
+        .nav-avatar-fallback{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+
+        /* dropdown menu */
+        .avatar-menu{position:absolute;right:0;top:52px;width:280px;background:#0f1724;color:#e6eef8;border-radius:12px;box-shadow:0 20px 40px rgba(2,6,23,0.6);display:none;overflow:hidden;transform-origin:top right;transition:transform .14s ease,opacity .12s ease;z-index:1200}
+        .avatar-menu[aria-hidden="false"]{display:block;transform:translateY(0);opacity:1}
+        .menu-top{display:flex;gap:12px;padding:14px;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center}
+        .menu-top .menu-avatar img{width:56px;height:56px;border-radius:12px;object-fit:cover}
+        .menu-avatar-fallback{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-weight:700}
+        .menu-user .menu-username{color:#fff;font-weight:800}
+        .menu-user .menu-email{color:rgba(226,235,245,0.8);font-size:.9rem;margin-top:2px}
+
+        /* items */
+        .menu-items{display:flex;flex-direction:column;padding:8px}
+        .menu-item{background:transparent;border:0;color:#e6eef8;text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+        .menu-item:hover{background:rgba(255,255,255,0.03)}
+        .menu-item-logout{color:#ff7b7b;font-weight:800}
+
+        /* verhindern vom Unterstreichen im Avatar‑Dropdown */
+        .avatar-menu a,
+        .avatar-menu .menu-item,
+        .avatar-menu .menu-item a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        /* small responsive */
+        @media (max-width:640px){
+          .topnav{padding:10px;border-radius:8px}
+          .nav-avatar, .nav-avatar-fallback{width:34px;height:34px}
+          .avatar-menu{width:240px;right:6px}
+        }
+
+        /* dark mode styles */
+        .dark-mode {
+          background-color: #121212;
+          color: #ffffff;
+        }
+        .dark-mode nav {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .dark-mode .container {
+          background: rgba(255, 255, 255, 0.2);
+        }
+        .dark-mode .modal-content {
+          background: #1e1e1e;
+          color: #e0e0e0;
+        }
+        .dark-mode .btn {
+          background: rgba(255, 255, 255, 0.06);
+          color: #fff;
+        }
+        .dark-mode .btn:hover {
+          background: rgba(255, 255, 255, 0.09);
+        }
+        .dark-mode input,
+        .dark-mode textarea {
+          background: #2c2c2c;
+          color: #e0e0e0;
+          border: 1px solid #444;
+        }
+        .dark-mode .error {
+          background: #3a3a3a;
+          color: #f8d7da;
+        }
+        .dark-mode .success {
+          background: #3a3a3a;
+          color: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <nav class="topnav">
+      <div class="nav-left">
+        <div class="brand"><span class="brand-name">CutWeb</span></div>
+      </div>
+
+      <div class="nav-right">
+        <button class="btn support-btn" onclick="openSupport()" title="Support">
+          <!-- simple chat icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Support
+        </button>
+
+        {% if not session.get('username') %}
+          <button class="btn login-btn" onclick="openModal()">Anmelden</button>
+        {% else %}
+          <div class="avatar-menu-wrapper" id="avatarMenuWrapper">
+  <button id="avatarToggle" class="avatar-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleAvatarMenu(event)">
+    {% set u = users.get(session['username']) %}
+    {% if u and u.get('avatar') %}
+      <img src="{{ url_for('static', filename=u.avatar) }}" alt="Avatar" class="nav-avatar">
+    {% else %}
+      <div class="nav-avatar-fallback">{{ session['username'][0]|upper }}</div>
+    {% endif %}
+  </button>
+
+  <div id="avatarMenu" class="avatar-menu" role="menu" aria-hidden="true">
+    <div class="menu-top">
+      <div class="menu-avatar">
+        {% if u and u.get('avatar') %}
+          <img src="{{ url_for('static', filename=u.avatar) }}" alt="Avatar" />
+        {% else %}
+          <div class="menu-avatar-fallback">{{ session['username'][0]|upper }}</div>
+        {% endif %}
+      </div>
+      <div class="menu-user">
+        <div class="menu-username">{{ session['username'] }}</div>
+        <div class="menu-email">{{ users.get(session['username']).email }}</div>
+      </div>
+    </div>
+
+    <!-- Profil-Kategorie -->
+    <div class="menu-category">
+      <div class="menu-category-title">Profil</div>
+      <button class="menu-item" onclick="closeAvatarMenu(); window.location.href='/profile';">Profil bearbeiten</button>
+    </div>
+
+    <!-- Sicherheit-Kategorie -->
+    <div class="menu-category">
+      <div class="menu-category-title">Sicherheit</div>
+      <button class="menu-item" onclick="closeAvatarMenu(); window.location.href='/change_password';">Passwort ändern</button>
+    </div>
+
+    <!-- Aktivitäten-Kategorie -->
+    <div class="menu-category">
+      <div class="menu-category-title">Aktivitäten</div>
+      <button class="menu-item" onclick="closeAvatarMenu(); window.location.href='/activity';">Letzte Aktivitäten</button>
+    </div>
+
+    <!-- Streaming-Kategorie -->
+    <div class="menu-category">
+      <div class="menu-category-title">Streaming</div>
+      <button class="menu-item" onclick="closeAvatarMenu(); window.location.href='/stream';">Live-Stream</button>
+    </div>
+
+    <!-- Admin-Bereich -->
+    {% if user.is_admin %}
+    <div class="menu-category">
+      <div class="menu-category-title">Admin</div>
+      <button class="menu-item" onclick="closeAvatarMenu(); window.location.href='/admin';">Admin-Bereich</button>
+    </div>
+    {% endif %}
+
+     <div class="menu-category">
+      <div class="menu-category-title">Allgemein</div>
+       <a href="/upload" class="button">Datei hochladen</a>
+        <a href="/notifications" class="button">Benachrichtigungen</a>
+        <a href="/logout" class="button logout">Abmelden</a>
+        <div class="language-switch">
+            <a href="/set_language/en">English</a> | <a href="/set_language/de">Deutsch</a>
+   
+    <!-- Abmelden -->
+    <div class="menu-category">
+      <form action="/logout" method="get" style="margin:0">
+        <button class="menu-item menu-item-logout" type="submit">Abmelden</button>
+      </form>
+    </div>
+  </div>
+</div>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- Modal mit Login / Register / Verify -->
+    <div id="authModal" class="modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <h2>Authentifizierung</h2>
+                <button aria-label="Schließen" onclick="closeModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer">&times;</button>
+            </div>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="login" onclick="switchTab(event)">Anmelden</button>
+                <button class="tab-btn" data-tab="register" onclick="switchTab(event)">Registrieren</button>
+                <button class="tab-btn" data-tab="verify" id="verifyTabBtn" onclick="switchTab(event)" style="display:none">Bestätigen</button>
+            </div>
+
+            <!-- Login -->
+            <div id="login" class="tab-content active">
+                <form action="/login" method="POST">
+                    <label for="login_username">Benutzername</label>
+                    <input id="login_username" name="username" type="text" required>
+                    <label for="login_password">Passwort</label>
+                    <input id="login_password" name="password" type="password" required>
+                    <div style="margin-top:.8rem;text-align:right">
+                        <button type="submit">Anmelden</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register -->
+            <div id="register" class="tab-content">
+                <form id="registerForm" action="/register" method="POST">
+                    <label for="register_username">Benutzername</label>
+                    <input id="register_username" name="username" type="text" required>
+                    <label for="register_email">E‑Mail</label>
+                    <input id="register_email" name="email" type="email" required>
+                    <label for="register_password">Passwort</label>
+                    <input id="register_password" name="password" type="password" required>
+                    <div style="margin-top:.8rem;text-align:right">
+                        <button type="submit">Registrieren</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Verify -->
+            <div id="verify" class="tab-content">
+                <form action="/verify" method="POST" id="verifyForm">
+                    <label for="verify_username">Benutzername</label>
+                    <input id="verify_username" name="username" type="text" required>
+                    <label for="verify_code">Bestätigungscode</label>
+                    <input id="verify_code" name="code" type="text" placeholder="6-stelliger Code" required>
+                    <div style="margin-top:.8rem;text-align:right">
+                        <button type="submit">Bestätigen</button>
+                    </div>
+                </form>
+
+                <!-- Resend code -->
+                <form id="resendForm" action="/resend_verification" method="POST" style="margin-top:.8rem;text-align:left">
+                    <input type="hidden" name="username" id="resend_username">
+                    <button type="submit" style="background:none;border:0;color:#007bff;cursor:pointer;padding:0">Code erneut senden</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div id="supportModal" class="modal" aria-hidden="true" style="display:none">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+                <h3>Support-Anfrage</h3>
+                <button onclick="closeSupport()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">&times;</button>
+            </div>
+            <form action="/support" method="POST">
+                <label for="support_topic">Thema</label>
+                <input id="support_topic" name="topic" type="text" required>
+                <label for="support_message" style="margin-top:.6rem">Beschreibung</label>
+                <textarea id="support_message" name="message" required></textarea>
+                <div style="margin-top:.8rem;text-align:right">
+                    <button type="submit">Absenden</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Avatar Modal -->
+    <div id="avatarModal" class="modal" style="display:none;align-items:center;justify-content:center">
+      <div class="modal-content" style="max-width:420px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>Profilbild</h3>
+          <button onclick="closeAvatarModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer">&times;</button>
+        </div>
+        <div style="text-align:center;margin:0.6rem 0">
+          <img id="avatarPreview" src="{% if session.get('username') and users.get(session['username']) and users[session['username']].get('avatar') %}{{ url_for('static', filename=users[session['username']].avatar) }}{% else %}{{ url_for('static', filename='default-avatar.png') }}{% endif %}" style="width:120px;height:120px;border-radius:12px;object-fit:cover">
+        </div>
+        <form action="/upload_avatar" method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:.5rem">
+          <input id="avatarInput" type="file" name="avatar" accept="image/*">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <button type="submit" class="btn btn-primary">Hochladen</button>
+            <form id="removeAvatarForm" action="/remove_avatar" method="post" style="margin:0">
+              <button type="submit" class="btn btn-ghost">Entfernen</button>
+            </form>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    
+    <!-- Hauptinhalt -->
+
+    <script>
+        function openModal(){ document.getElementById('authModal').classList.add('show'); }
+        function closeModal(){ document.getElementById('authModal').classList.remove('show'); }
+
+        function openSupport(){
+            document.getElementById('supportModal').style.display = 'flex';
+        }
+        function closeSupport(){
+            document.getElementById('supportModal').style.display = 'none';
+        }
+
+        function openAvatarModal(){ document.getElementById('avatarModal').style.display = 'flex'; }
+        function closeAvatarModal(){ document.getElementById('avatarModal').style.display = 'none'; }
+
+        function switchTab(e){
+            const tab = e.currentTarget.getAttribute('data-tab');
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        // immer Verify-Tab sichtbar (entferne display:none aus Verify-Tab-Button)
+        document.getElementById('verifyTabBtn').style.display = 'inline-block';
+
+        // Fülle versteckte Username-Felder für "erneut senden"
+        function syncVerifyUsername(){
+            const v = document.getElementById('verify_username')?.value || document.getElementById('register_username')?.value || '';
+            if(v) document.getElementById('resend_username').value = v;
+        }
+
+        document.getElementById('verify_username')?.addEventListener('input', syncVerifyUsername);
+        document.getElementById('register_username')?.addEventListener('input', syncVerifyUsername);
+
+        document.getElementById('registerForm')?.addEventListener('submit', function(e){
+            setTimeout(()=>{
+                document.getElementById('verifyTabBtn').style.display = 'inline-block';
+                const regUser = document.getElementById('register_username')?.value;
+                if(regUser) {
+                    document.getElementById('verify_username').value = regUser;
+                    document.getElementById('resend_username').value = regUser;
+                }
+                openModal();
+                document.querySelector('.tab-btn[data-tab="verify"]').click();
+            }, 500);
+        });
+
+        // Falls Seite mit success kommt (z.B. "Bestätigungscode wurde gesendet"), öffne Modal + Verify-Tab
+        (function(){
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('success') && params.get('success').toLowerCase().includes('bestätigungscode')){
+                document.getElementById('verifyTabBtn').style.display = 'inline-block';
+                openModal();
+                document.querySelector('.tab-btn[data-tab="verify"]').click();
+            }
+        })();
+
+        // Klick außerhalb schließt Modal
+        window.addEventListener('click', function(ev){
+            const modal = document.getElementById('authModal');
+            const sModal = document.getElementById('supportModal');
+            const aModal = document.getElementById('avatarModal');
+            if(ev.target === modal) closeModal();
+            if(ev.target === sModal) closeSupport();
+            if(ev.target === aModal) closeAvatarModal();
+        });
+
+        document.getElementById('avatarInput')?.addEventListener('change', function(e){
+          const f = e.target.files[0];
+          if(!f) return;
+          const url = URL.createObjectURL(f);
+          document.getElementById('avatarPreview').src = url;
+        });
+
+        // Avatar Menü togglen
+        function toggleAvatarMenu(e) {
+          const menu = document.getElementById('avatarMenu');
+          const isOpen = menu.getAttribute('aria-hidden') === 'false';
+          if (isOpen) closeAvatarMenu();
+          else openAvatarMenu();
+        }
+
+        function openAvatarMenu() {
+          const menu = document.getElementById('avatarMenu');
+          const btn = document.getElementById('avatarToggle');
+          menu.setAttribute('aria-hidden', 'false');
+          btn.setAttribute('aria-expanded', 'true');
+          document.addEventListener('click', outsideAvatarClick);
+        }
+
+        function closeAvatarMenu() {
+          const menu = document.getElementById('avatarMenu');
+          const btn = document.getElementById('avatarToggle');
+          if (menu) menu.setAttribute('aria-hidden', 'true');
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+          document.removeEventListener('click', outsideAvatarClick);
+        }
+
+        function outsideAvatarClick(ev) {
+          const wrapper = document.getElementById('avatarMenuWrapper');
+          if (!wrapper) return;
+          if (!wrapper.contains(ev.target)) closeAvatarMenu();
+        }
+        // Dropdown-Shortcuts: beim Öffnen Fokus auf erstem Item
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Vorhandene Leiste -->
+    <!-- Hauptinhalt -->
+    <div class="container">
+        <h1>Willkommen, {{ user.name }}</h1>
+        <p>Du bist erfolgreich eingeloggt.</p>
+    </div>
+
+    <script>
+        // Dark Mode / White Mode Umschalten
+        const toggleModeButton = document.getElementById('toggle-mode');
+        toggleModeButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                toggleModeButton.textContent = 'White Mode';
+            } else {
+                toggleModeButton.textContent = 'Dark Mode';
+            }
+        });
+    </script>
+</body>
+</html>

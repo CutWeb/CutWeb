@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Systemstatistiken{% endblock %}
+{% block content %}
+<h1>Systemstatistiken</h1>
+<p>Benutzer: {{ stats.total_users }}</p>
+<p>Dateien: {{ stats.uploaded_files }}</p>
+<p>Aktivitäten: {{ stats.activities }}</p>
+{% endblock %}
+

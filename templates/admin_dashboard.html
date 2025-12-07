@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Admin-Dashboard{% endblock %}
+{% block content %}
+<h1 class="mb-4">Admin-Dashboard</h1>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Benutzerverwaltung</h5>
+                <p class="card-text">Verwalte Benutzerkonten und deren Rollen.</p>
+                <a href="/admin/users" class="btn btn-primary">Benutzer verwalten</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Systemstatistiken</h5>
+                <p class="card-text">Zeige Statistiken zur Plattformnutzung.</p>
+                <a href="/admin/stats" class="btn btn-primary">Statistiken anzeigen</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Aktivitätsprotokoll</h5>
+                <p class="card-text">Überwache Aktivitäten auf der Plattform.</p>
+                <a href="/admin/activity" class="btn btn-primary">Protokoll anzeigen</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Sicherheitsüberwachung</h5>
+                <p class="card-text">Überwache sicherheitsrelevante Ereignisse.</p>
+                <a href="/admin/security" class="btn btn-primary">Sicherheitsberichte</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Dateiüberwachung</h5>
+                <p class="card-text">Verwalte hochgeladene Dateien.</p>
+                <a href="/admin/files" class="btn btn-primary">Dateien verwalten</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rollenverwaltung</h5>
+                <p class="card-text">Verwalte Benutzerrollen und Berechtigungen.</p>
+                <a href="/admin/roles" class="btn btn-primary">Rollen verwalten</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Systembenachrichtigungen</h5>
+                <p class="card-text">Sende Benachrichtigungen an Benutzer.</p>
+                <a href="/admin/notifications" class="btn btn-primary">Benachrichtigungen</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Backup und Wiederherstellung</h5>
+                <a href="/admin/backup" class="btn btn-primary">Backup erstellen</a>
+                <form action="/admin/restore" method="POST" class="mt-2">
+                    <select name="backup_file" class="form-control">
+                        {% for file in backup_files %}
+                            <option value="{{ file }}">{{ file }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-warning mt-2">Backup wiederherstellen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Audit-Logs</h5>
+                <p class="card-text">Überwache Admin-Aktivitäten.</p>
+                <a href="/admin/audit" class="btn btn-primary">Audit-Logs</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">API-Verwaltung</h5>
+                <p class="card-text">Verwalte API-Schlüssel und Integrationen.</p>
+                <a href="/admin/api_keys" class="btn btn-primary">API-Verwaltung</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

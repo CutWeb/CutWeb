@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Aktivitätsprotokoll{% endblock %}
+{% block content %}
+<h1>Aktivitätsprotokoll</h1>
+<ul>
+    {% for activity in activities %}
+        <li>{{ activity.username }} - {{ activity.action }} - {{ activity.timestamp }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

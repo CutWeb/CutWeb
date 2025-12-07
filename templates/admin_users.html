@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benutzerverwaltung</title>
+<style>
+body{font-family:'Segoe UI',Tahoma,Arial;background:#f6f8fb;color:#111;padding:1.5rem}
+.container{max-width:1000px;margin:0 auto;background:#fff;border-radius:10px;padding:1.2rem;box-shadow:0 10px 30px rgba(16,24,40,.08)}
+.header{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.meta{color:#6b7280;font-size:.95rem}
+.actions{display:flex;gap:.6rem}
+.btn{padding:.5rem .8rem;border-radius:8px;border:0;cursor:pointer}
+.btn-primary{background:#0d6efd;color:#fff}
+.btn-ghost{background:#f1f3f5;border:1px solid #e6e9ee}
+.section{margin-top:1rem}
+.user-card{display:flex;gap:1.2rem;align-items:center}
+.avatar{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.4rem}
+.table{width:100%;border-collapse:collapse;margin-top:.8rem}
+th,td{padding:.6rem;border-bottom:1px solid #f0f2f5;vertical-align:top}
+.ticket{background:#fbfdff;border:1px solid #eef5ff;padding:.8rem;border-radius:8px;margin-bottom:.6rem}
+.small{font-size:.9rem;color:#6b7280}
+textarea{width:100%;min-height:90px;padding:.6rem;border:1px solid #e6eef8;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Benutzerverwaltung</h1>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>Alle Benutzer</h3>
+        <a href="/admin/users/add" class="btn btn-success mb-3">Benutzer hinzufügen</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Benutzername</th>
+                    <th>E-Mail</th>
+                    <th>Rolle</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for username, user in users.items() %}
+                <tr>
+                    <td>{{ username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        <a href="/admin/users/edit/{{ username }}" class="btn btn-primary btn-sm">Bearbeiten</a>
+                        <form action="/admin/users/delete/{{ username }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Löschen</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

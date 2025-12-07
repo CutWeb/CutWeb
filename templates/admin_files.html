@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Dateiüberwachung{% endblock %}
+{% block content %}
+<h1>Dateiüberwachung</h1>
+<table>
+    <tr>
+        <th>Dateiname</th>
+        <th>Aktion</th>
+    </tr>
+    {% for file in files %}
+    <tr>
+        <td>{{ file }}</td>
+        <td>
+            <a href="/upload_to_drive/{{ file }}" class="btn btn-success btn-sm">Zu Google Drive hochladen</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+

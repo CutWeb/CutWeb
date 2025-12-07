@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}API-Verwaltung{% endblock %}
+{% block content %}
+<h1>API-Verwaltung</h1>
+<form method="POST">
+    <input type="text" name="name" placeholder="API-Schlüsselname">
+    <button type="submit">Erstellen</button>
+</form>
+<ul>
+    {% for key in api_keys %}
+        <li>{{ key }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
