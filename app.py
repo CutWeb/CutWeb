@@ -32,10 +32,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 load_dotenv()
 
-SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_SERVER = os.getenv("smp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))  # Standardwert 587 für TLS
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+EMAIL_ADDRESS = os.getenv("cutweb0@gmail.com")
+EMAIL_PASSWORD = os.getenv("hflk szeq voyc mzjq")
 
 AUDIT_LOG_FILE = 'audit_logs.json'
 
@@ -302,9 +302,21 @@ def manage_api_keys():
 def send_email(to_email, subject, body):
     try:
         # E-Mail-Nachricht erstellen
-        msg = MIMEText(body)
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h2 style="color: #333;">{subject}</h2>
+                <p>{body}</p>
+                <hr>
+                <p style="font-size: 0.9em; color: #555;">Mit freundlichen Grüßen,<br><strong>CutWeb</strong></p>
+            </div>
+        </body>
+        </html>
+        """
+        msg = MIMEText(html_body, "html")
         msg["Subject"] = subject
-        msg["From"] = EMAIL_ADDRESS
+        msg["From"] = f"CutWeb <{EMAIL_ADDRESS}>"
         msg["To"] = to_email
 
         # Verbindung zum SMTP-Server herstellen
