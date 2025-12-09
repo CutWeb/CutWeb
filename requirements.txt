@@ -8,3 +8,4 @@ google-auth-oauthlib==1.0.0
 Werkzeug==2.3.7
 pyotp
 qrcode[pil]
+flask-socketio
