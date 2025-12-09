@@ -8,17 +8,26 @@
 </head>
 <body>
     <div class="container">
+        {% extends "base.html" %}
+        {% block title %}Benachrichtigungen{% endblock %}
+        {% block content %}
         <h1>Benachrichtigungen</h1>
-        {% if notifications %}
-            <ul>
-                {% for notification in notifications %}
-                    <li>{{ notification.message }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Keine Benachrichtigungen</p>
-        {% endif %}
-        <a href="/">Zurück</a>
+        <ul id="notification-list">
+            {% for notification in notifications %}
+            <li>{{ notification.message }}</li>
+            {% endfor %}
+        </ul>
+        <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+        <script>
+            const socket = io();
+            socket.on('new_notification', function(notification) {
+                const list = document.getElementById('notification-list');
+                const item = document.createElement('li');
+                item.textContent = notification.message;
+                list.appendChild(item);
+            });
+        </script>
+        {% endblock %}
     </div>
 </body>
 </html>
