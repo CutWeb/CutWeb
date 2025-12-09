@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}2FA einrichten{% endblock %}
+{% block content %}
+<h1>2FA einrichten</h1>
+<p>Scanne den folgenden QR-Code mit Google Authenticator oder einer ähnlichen App:</p>
+<img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+<form method="POST" action="/2fa/verify">
+    <div class="form-group">
+        <label>Code</label>
+        <input type="text" name="code" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Code überprüfen</button>
+</form>
+{% endblock %}
