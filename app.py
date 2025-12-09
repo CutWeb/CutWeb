@@ -56,11 +56,6 @@ AUDIT_LOG_FILE = 'audit_logs.json'
 # Temporäre Speicherung von fehlgeschlagenen Login-Versuchen
 login_attempts = {}
 
-# reCAPTCHA Konfiguration
-app.config['RECAPTCHA_SITE_KEY'] = os.getenv('6LcUbSYsAAAAAJfnrIyZO6qOQZ1GoyQV7YcSpsHt')
-app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('6LcUbSYsAAAAAEIMGw_QNH9qZ6F07fsjJst6I6gz')
-
-recaptcha = ReCaptcha(app)
 
 # Load users from JSON
 def load_users():
