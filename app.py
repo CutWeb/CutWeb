@@ -19,6 +19,7 @@ import pyotp
 import qrcode
 from io import BytesIO
 import base64
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -570,5 +571,23 @@ def log_audit(action, username, details=None):
     with open(AUDIT_LOG_FILE, 'w') as f:
         json.dump(logs, f, indent=4)
 
+socketio = SocketIO(app)
+
+@app.route('/send_notification', methods=['POST'])
+def send_notification():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    message = request.form['message']
+    username = session['username']
+    notification = {'username': username, 'message': message}
+    notifications.append(notification)
+
+    # Sende die Benachrichtigung in Echtzeit
+    socketio.emit('new_notification', notification, broadcast=True)
+
+    flash("Benachrichtigung gesendet!", "success")
+    return redirect(url_for('show_notifications'))
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5002, host='0.0.0.0')
+    socketio.run(app, debug=True, port=5002, host='0.0.0.0')
