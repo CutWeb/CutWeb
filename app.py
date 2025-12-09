@@ -15,6 +15,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
 from datetime import datetime
+import pyotp
+import qrcode
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -142,6 +146,45 @@ def two_factor_auth():
         flash("Ungültiger Code", "error")
 
     return render_template('2fa.html')
+
+@app.route('/2fa/setup', methods=['GET'])
+def setup_2fa():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    # Generiere einen geheimen Schlüssel für den Benutzer
+    secret = pyotp.random_base32()
+    session['2fa_secret'] = secret
+
+    # Erstelle einen OTP-URI für Google Authenticator
+    otp_uri = pyotp.totp.TOTP(secret).provisioning_uri(
+        name=session['username'], issuer_name="CutWeb"
+    )
+
+    # Generiere einen QR-Code
+    qr = qrcode.make(otp_uri)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render_template('2fa_setup.html', qr_code=qr_code_base64)
+
+@app.route('/2fa/verify', methods=['POST'])
+def verify_2fa():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    code = request.form['code']
+    secret = session.get('2fa_secret')
+    totp = pyotp.TOTP(secret)
+
+    if totp.verify(code):
+        session['2fa_authenticated'] = True
+        flash("2FA erfolgreich eingerichtet!", "success")
+        return redirect(url_for('index'))
+    else:
+        flash("Ungültiger Code", "error")
+        return redirect(url_for('setup_2fa'))
 
 def role_required(role):
     def decorator(func):
