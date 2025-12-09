@@ -9,4 +9,5 @@ Werkzeug==2.3.7
 pyotp
 qrcode[pil]
 flask-socketio
-flask-recaptcha
+Flask-WTF
+
