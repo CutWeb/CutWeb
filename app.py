@@ -31,7 +31,7 @@ from flask_wtf.recaptcha import RecaptchaField
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'irgendwas-sehr-geheimes'
 app.config['RECAPTCHA_PUBLIC_KEY'] = 'DEIN_PUBLIC_KEY'
-app.config['RECAPTCHA_PRIVATE_KEY'] = 'DEIN_PRIVATE_KEY'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6LcUbSYsAAAAAEIMGw_QNH9qZ6F07fsjJst6I6gz'
 
 users_file = "users.json"
 reset_tokens = {}  # Temporäre Speicherung von Passwort-Reset-Tokens
