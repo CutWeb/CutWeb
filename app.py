@@ -20,6 +20,8 @@ import qrcode
 from io import BytesIO
 import base64
 from flask_socketio import SocketIO, emit
+import requests
+from flask_recaptcha import ReCaptcha
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -43,6 +45,15 @@ EMAIL_ADDRESS = os.getenv("cutweb0@gmail.com")
 EMAIL_PASSWORD = os.getenv("hflk szeq voyc mzjq")
 
 AUDIT_LOG_FILE = 'audit_logs.json'
+
+# Temporäre Speicherung von fehlgeschlagenen Login-Versuchen
+login_attempts = {}
+
+# reCAPTCHA Konfiguration
+app.config['RECAPTCHA_SITE_KEY'] = os.getenv('6LcUbSYsAAAAAJfnrIyZO6qOQZ1GoyQV7YcSpsHt')
+app.config['RECAPTCHA_SECRET_KEY'] = os.getenv('6LcUbSYsAAAAAEIMGw_QNH9qZ6F07fsjJst6I6gz')
+
+recaptcha = ReCaptcha(app)
 
 # Load users from JSON
 def load_users():
@@ -69,8 +80,16 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        if not recaptcha.verify():
+            flash("reCAPTCHA-Überprüfung fehlgeschlagen. Bitte versuche es erneut.", "error")
+            return redirect(url_for('login'))
+
         username = request.form['username']
         password = request.form['password']
+        if username in login_attempts and login_attempts[username] >= 5:
+            flash("Zu viele fehlgeschlagene Versuche. Bitte warte 5 Minuten.", "error")
+            return redirect(url_for('login'))
+
         users = load_users()
         if username in users and users[username]['password'] == password:
             session['username'] = username
@@ -82,7 +101,7 @@ def login():
             send_email(users[username]['email'], "Dein 2FA-Code", f"Dein Code lautet: {code}")
             flash("Ein 2FA-Code wurde an deine E-Mail gesendet.", "success")
             return redirect(url_for('two_factor_auth'))
-
+        login_attempts[username] = login_attempts.get(username, 0) + 1
         flash("Benutzername oder Passwort ist falsch", "error")
     return render_template('login.html')
 
