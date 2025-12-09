@@ -22,9 +22,16 @@ import base64
 from flask_socketio import SocketIO, emit
 import requests
 from flask_recaptcha import ReCaptcha
+from flask import Flask, render_template, request
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
+from flask_wtf.recaptcha import RecaptchaField
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+app.config['SECRET_KEY'] = 'irgendwas-sehr-geheimes'
+app.config['RECAPTCHA_PUBLIC_KEY'] = 'DEIN_PUBLIC_KEY'
+app.config['RECAPTCHA_PRIVATE_KEY'] = 'DEIN_PRIVATE_KEY'
 
 users_file = "users.json"
 reset_tokens = {}  # Temporäre Speicherung von Passwort-Reset-Tokens
